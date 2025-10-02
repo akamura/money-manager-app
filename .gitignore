@@ -1,1 +1,70 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Diagnostic reports
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage
+coverage
+*.lcov
+.nyc_output
+lib-cov
+
+# Build/Output
+dist/
+build/
+.next
+out
+.nuxt
+.svelte-kit/
+.docusaurus
+.serverless/
+.firebase/
+.dynamodb/
+
+# Dependency directories
+node_modules/
+jspm_packages/
+web_modules/
+bower_components
+
+# Caches
+.cache
+.parcel-cache
+.grunt
+.lock-wscript
+.npm
+.eslintcache
+.stylelintcache
+.node_repl_history
+.yarn-integrity
+.pnp.*
+.vscode-test
+
+# Vite/Vitepress
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+**/.vitepress/dist
+**/.vitepress/cache
+
+# dotenv (環境変数ファイルは上げない。雛形だけ許可)
 .env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# ⚠ public/ は無視しない（ここに index 系・login 系が入るため）
