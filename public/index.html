@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link href="index.css" rel="stylesheet">
+    <title>金銭簡易Webアプリ</title>
+</head>
+
+<body class="bg-light">
+    <!-- ヘッダー -->
+    <header class="bg-white border-bottom">
+        <div class="container py-3 d-flex align-items-center justify-content-between">
+            <h1 class="h3 m-0">金銭管理アプリ</h1>
+            <div>
+                <p id="today" class="text-muted m-0 small"></p>
+            </div>
+            <div class="d-flex flex-column align-items-center text-center gap-1">
+                <p class="h6 m-0 text-muted">ログインステータス</p>
+                <p class="m-0" id="login-status">ok</p>
+                <button id="logout-btn" class="btn border">ログアウト</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container my-4">
+
+        <section aria-labelledby="summary-title" class="mb4">
+            <h2 id="summary-title" class="h5 mb-3">期間別サマリー</h2>
+
+            <div id="expend_by_period" class="row g-3">
+                <!-- 今日 -->
+                <div class="col-12 col-md-4">
+                    <div class="card shadow-sm rounded-3 h-100">
+                        <div class="card-body">
+                            <h3 class="h6 text-muted">今日の出費</h3>
+                            <p id="expended_of_today" class="display-6 mb-1 text-end">0</p>
+                            <p class="text-muted mb-0">今日の出費(時給換算)</p>
+                            <p id="hourly_expended_of_today" class="fs-5 mb-0 text-end">0</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- 今週 -->
+                <div class="col-12 col-md-4">
+                    <div class="card shadow-sm rounded-3 h-100">
+                        <div class="card-body">
+                            <h3 class="h6 text-muted">今週の出費</h3>
+                            <p id="expended_of_week" class="display-6 mb-1 text-end">0</p>
+                            <p class="text-muted mb-0">今週の出費(時給換算)</p>
+                            <p id="hourly_expended_of_week" class="fs-5 mb-0 text-end">0</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- 今月 -->
+                <div class="col-12 col-md-4">
+                    <div class="card shadow-sm rounded-3 h-100">
+                        <div class="card-body">
+                            <h3 class="h6 text-muted">今月の出費</h3>
+                            <p id="expended_of_month" class="display-6 mb-1 text-end">0</p>
+                            <p class="text-muted mb-0">今月の出費(時給換算)</p>
+                            <p id="hourly_expended_of_month" class="fs-5 mb-0 text-end">0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 入力フォーム -->
+        <section aria-labelledby="input-title" class="mb-4">
+            <h2 id="input-title" class="h5 mb-3">出費入力</h2>
+            <form id="input_form" class="card shadow-sm rounded-3">
+                <div class="card-body">
+                    <div id="form_expend_section" class="row g-3 align-items-end">
+                        <div class="col-12 col-sm-4">
+                            <label for="now_expend" class="form-label">今の出費</label>
+                            <input id="now_expend" type="number" min="0" step="1" class="form-control" placeholder="例）1000">
+                        </div>
+                        <div class="col-12 col-sm-4">
+                            <label for="expend_of_type" class="form-label">出費種別</label>
+                            <select id="expend_of_type" class="form-select">
+                                <option value="investment">投資</option>
+                                <option value="book">本</option>
+                                <option value="comic">漫画</option>
+                                <option value="waste">浪費</option>
+                                <option value="entertainment">娯楽</option>
+                                <option value="gacha">ガチャ</option>
+                                <option value="food">食費</option>
+                                <option value="food_snack">食費（つまみ）</option>
+                                <option value="out_of_eating">外食</option>
+                                <option value="out_of_eating_drink">外食（酒）</option>
+                                <option value="delivery">デリバリー</option>
+                                <option value="alcohol">酒</option>
+                                <option value="gas">ガス</option>
+                                <option value="electricity_bill">電気</option>
+                                <option value="necessities">日用品</option>
+                                <option value="medi">医療費</option>
+                                <option value="other">その他</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-sm-4 d-grid">
+                            <button id="send_btn" type="button" class="btn btn-primary btn-lg">送信</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        <!-- 集計とグラフ -->
+
+        <section aria-labelledby="result-title" class="mb-5">
+            <h2 id="result-title" class="h5 mb-3">集計結果</h2>
+
+            <div id="summary_results" class="h5 mb-3">
+                <!-- テーブル -->
+                <div id="table_section" class="col-12 col-lg-6">
+                    <div class="card shadow-sm rounded-3">
+
+                        <div class="card-body">
+                            <h3 class="h6 mb-3">カテゴリ別合計</h3>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-striped table-hover align-middle mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">種類</th>
+                                            <th scope="col" class="text-end">金額(円)</th>
+                                        </tr>
+                                    </thead>
+
+                                    <!--ここはスクリプトで自動生成したい-->
+                                    <tbody id="tbody_add_item">
+
+                                        <tr>
+                                            <td>投資</td>
+                                            <td id="investment" class="text-end">0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>本</td>
+                                            <td id="book" class="text-end">0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>漫画</td>
+                                            <td id="comic" class="text-end">0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>浪費</td>
+                                            <td id="waste" class="text-end">0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>娯楽</td>
+                                            <td id="entertainment" class="text-end">0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>ガチャ</td>
+                                            <td id="gacha" class="text-end">0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>食費</td>
+                                            <td id="food" class="text-end">0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>食費（つまみ）</td>
+                                            <td id="food_snack" class="text-end">0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>外食</td>
+                                            <td id="out_of_eating" class="text-end">0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>外食（酒）</td>
+                                            <td id="out_of_eating_drink" class="text-end">0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>デリバリー</td>
+                                            <td id="delivery" class="text-end">0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>酒</td>
+                                            <td id="alcohol" class="text-end">0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>ガス</td>
+                                            <td id="gas" class="text-end">0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>電気</td>
+                                            <td id="electricity_bill" class="text-end">0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>日用品</td>
+                                            <td id="necessities" class="text-end">0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>医療費</td>
+                                            <td id="medi" class="text-end">0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>その他</td>
+                                            <td id="other" class="text-end">0</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- グラフ -->
+                <div id="graph_section" class="col-12 col-lg-6"><!--グラフを置く-->
+                    <div class="card shadow-sm rounded-3 h-100">
+                        <div class="card-body">
+                            <h3 class="h6 mb-3">内訳グラフ</h3>
+                            <div class="chart-wrap">
+                                <canvas id="pieChart" width="1600" height="900"></canvas>
+                            </div>
+                            <h2 class="h5 mb-3">推移グラフ</h2>
+                            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                                <div class="btn-group" role="group" aria-label="期間切り替え">
+                                    <button id="btnDaily"   type="button" class="btn btn-outline-primary btn-sm">日</button>
+                                    <button id="btnWeekly"  type="button" class="btn btn-outline-primary btn-sm">週</button>
+                                    <button id="btnMonthly" type="button" class="btn btn-outline-primary btn-sm">月</button>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <label for="chartType" class="m-0 small text-muted">表示</label>
+                                    <select id="chartType" class="form-select form-select-sm">
+                                        <option value="bar">棒グラフ</option>
+                                        <option value="line">折れ線</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="chart-wrap">
+                                <canvas id="seriesChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 追加項目 -->
+        <section aria-labelledby="add_title" class="mb-5">
+            <h2 id="add_title" class="h5 mb-3">項目を追加</h2>
+
+            <div id="add_section" class="card shadow-sm rounded-3">
+                <div class="card-body">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-12 col-md-5">
+                            <label for="add_type" class="form-label">種別</label>
+                            <input id="add_type" type="input" class="form_control" placeholder="例）サブスク">
+                        </div>
+                        <div class="col-12 col-md-5">
+                            <label for="add_id" class="form-label">id</label>
+                            <input id="add_id" type="input" class="form_control" placeholder="例）subscription">
+                        </div>
+                        <div class="col-12 col-md-2 d-grid">
+                            <button id="add_btn" class="btn btn-outline-secondary">追加</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section aria-labelledby="add_title" class="mb-5">
+            <h2 id="add_title" class="h5 mb-3">管理用</h2>
+            <div id="admin" class="card shadow-sm rounded-3">
+                <div class="card-body">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-12 col-md-5">
+                            <label for="adminId">管理ID</label>
+                            <input id="adminId" type="text">
+                        </div>
+                        <div class="col-12 col-md-5">
+                            <label for="adminPass">管理Pass</label>
+                            <input id="adminPass" type="password">
+                        </div>
+                        <div class="col-12 col-md-2 d-grid">
+                            <label for="adminBtn"></label>
+                            <button id="adminBtn" class="btn-secondary">送信</button>
+                        </div>
+                    </div>
+
+
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="index.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <!-- Google フォント -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+    <title>簡易家計簿アプリ</title>
+</head>
+<style>
+    #login-form {
+        display: flex;
+        flex-direction: column;
+        padding-bottom: 10px;
+        border: 3px solid black;
+        border-radius: 5px;
+        max-width: 60%;
+        gap:10px;
+    }
+    #login-form > label,
+    #login-form > input {
+        width: 50%;
+        margin: auto;
+    }
+
+    #login-form > .btn {
+        width: 300px;
+        margin: auto;     
+        margin-top: 15px; 
+        border: 1px solid black;
+        box-shadow: 5px 5px gray; 
+        transition: box-shadow 0.2s ease; 
+    }
+    #login-form .btn:active,
+    #login-form .btn:focus,
+    #login-form .btn:focus-visible {
+        box-shadow: none;
+        opacity: 0.7;
+        transform: translateY(2px); /* 影の分だけ下に移動 */
+    }
+</style>
+<body>
+    <div id="today-display" class="container my-4 text-center">
+        <h1><span id="month"></span>月<span id="day"></span>日（<span id="week"></span>）</h1>
+    </div>
+    <form id="login-form" class="container text-center">
+        <label for="user-id">ID</label>
+        <input id="user-id" type="text" value="tamura">
+
+        <label for="user-pass">Pass</label>
+        <input id="user-pass" type="password" value="1234">
+
+        <button id="send-btn" type="button" class="btn btn-primary" width="10">送信</button>
+        <label for="send-btn"></label>
+    </form>    
+
+    <div class="container mt-3">
+        <div class="text-center">
+            <button id="register-btn" class="btn btn-lg shadow border border-primary">新規登録</button>
+            <label for="register-btn"></label>
+        </div>
+
+    </div>
+
+    <script src="/login/login.js"></script>
+    <script>
+        const now = new Date();
+        let month = now.getMonth() + 1;
+        let day = now.getDate();
+        let week = ["日","月","火","水","木","金","土"][now.getDay()];
+
+        document.getElementById("month").textContent = month;
+        document.getElementById("day").textContent = day;
+        document.getElementById("week").textContent = week;
+        
+    </script>
+
+    <!-- <script>
+        (function() {
+            const s = document.createElement("script");
+
+            if (location.protocol === "file:" || location.pathname.startsWith("/login/")) {
+                s.src = "login.js";
+            } else {
+                // s.src = "/login/login.js"
+                s.src = "./login.js";
+            }
+
+            document.body.appendChild(s);
+        })();
+
+        console.log("-----------------test--------------------");
+        console.log(document.getElementsByName("script"));
+    </script> -->
+</body>
+</html>

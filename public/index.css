@@ -1,0 +1,54 @@
+
+.table td,.table th {
+    vertical-align: middle;
+}
+
+label.form-label {
+    background: transparent;
+    height: auto;
+    text-align: left;
+}
+
+.chart-wrap {
+    width: 100%;
+    aspect-ratio: 16/9;
+    position: relative;
+    padding: .5rem;
+}
+
+.chart-wrap canvas {
+    position:absolute;
+    inset: 0;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+#summary_results {
+    display:flex;
+    justify-content:space-between;
+}
+
+#today {
+    letter-spacing: 0.02rem;
+}
+
+#add_btn {
+    border-width: 1px;
+}
+
+/* header > div > h1, header > div > div {
+    background-color: aquamarine;
+} */
+
+/* 画面が狭いときは縦並び */
+@media (max-width: 950px) {
+  #summary_results {
+    flex-direction: column;
+  }
+
+  #summary_results > div {
+    width: 100%;
+    margin-bottom: 1rem; /* 下に少し余白をつける */
+  }
+}
+

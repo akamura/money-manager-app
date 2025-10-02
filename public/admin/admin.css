@@ -1,0 +1,46 @@
+.table-fixed {
+    table-layout: fixed;
+}
+
+.table-fixed td,
+.table-fixed th {
+    vertical-align: middle;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table-fixed td:nth-child(6),
+.table-fixed th:nth-child(6),
+.table-fixed td:nth-child(7),
+.table-fixed th:nth-child(7) {
+    white-space: nomal;
+    overflow: visible;
+    text-overflow: unset;
+}
+
+.table-fixed td:nth-child(6),
+.table-fixed th:nth-child(6){
+    text-align:center;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+}
+
+.table-fixed td:nth-child(7),
+.table-fixed th:nth-child(7){
+    text-align:center;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+}
+
+.table-responsive {
+    -webkit-overflow-scrolling: touch;
+}
+
+.cell-check,
+th.text-center,
+td.text-center {
+    text-align: center !important;
+}
