@@ -153,6 +153,46 @@
         </div>
         
     </section>
+    <section>
+        <!-- ユーザーの管理 -->
+        <h1 class="text-center my-4">ユーザーの管理</h1>
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form id="addForm" class="d-flex flex-wrap gap-2">
+                        <div class="col-12">
+                            <!-- <button id="userBtnSearch" class="btn btn-primary">検索</button> -->
+                            <button id="userBtnEdit" class="btn btn-outline-primary">編集</button>
+                            <button id="userBtnDelete" class="btn btn-outline-danger">削除</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="card shadow-sm mt-3 mb-3">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-striped table-hover align-middle mb-0 table-fixed">
+                            <colgroup>
+                                <col style="width: 60%;">
+                                <col style="width: 30%;">
+                                <col style="width: 10%;">
+                            </colgroup>
+                        
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">権限</th>
+                                <th scope="col" class="text-center">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-userInfo"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer>
+        <a href="/changePass/change.html">パスワードの変更</a>
+    </footer>
     
 </main>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

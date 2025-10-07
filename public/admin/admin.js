@@ -130,7 +130,9 @@ window.addEventListener("load", async (e) => {
     }
 
 
-    addItemFn();//追加項目の表示
+    addItemFn();//追加項目の表示]
+    await userInfomation();
+
 });
 
 //通常画面に戻るボタン
@@ -156,7 +158,6 @@ async function pastTable () {
     const userName = document.getElementById("user_name").value;
     const cateName = document.getElementById("cate_name").value;
 
-    // console.log("cateName",cateName)
 
     if(startDate === "" || endDate === "") {
         alert("必須項目は入力してください");//入力されていない場合は全期間にする
@@ -174,13 +175,11 @@ async function pastTable () {
     });
 
     const postData = await postRes.json();//引き出したデータ
-    console.log("応答：",postData);
 
     let convertArray = categolyArray;
     let convertName = cateName;
 
     serachedArray = postData.items;//検索結果のデータ
-    // console.log("serachedArray: ",serachedArray)
 
     if(cateName !== "all"){
         //名前が一致する項目だけを配列に追加
@@ -190,7 +189,6 @@ async function pastTable () {
             }
         });
     } else if(cateName === "all") {
-        // console.log("all");
     }
     //idの文字列を名前に変換
     for(let obj of convertArray) {
@@ -229,7 +227,6 @@ async function pastTable () {
         `
         //idを埋め込む場合は一意性の強いものを使用すること　${item.expenseId}-box　//
     }
-    // console.log(tbodyTable);
     document.getElementById("tbody").insertAdjacentHTML('beforeend', tbodyTable);
 }
 
@@ -247,15 +244,11 @@ btnEdit.addEventListener("click",async (e) => {
         checkbox();
         editMode = true;
         btnEdit.textContent = "保存";
-        // console.log("test");
-        // console.log("editMode: ",editMode);
     } else {
         await edit();
         await pastTable();
         editMode = false;
         btnEdit.textContent = "編集";
-        // console.log("test2");
-        // console.log("editMode2: ",editMode);
     }
 
 });
@@ -279,9 +272,7 @@ function checkbox  () {
                         expence: item.expended
             });
             let head = document.getElementById(`${item.expenseId}-head`);
-            // console.log(head);
             head.textContent = "";
-            // console.log("item.date: ",Date(item.date));
             let date = `${new Date(item.date).getFullYear()}-${String(new Date(item.date).getMonth() + 1).padStart(2,"0")}-${String(new Date(item.date).getDate()).padStart(2,"0")}`
             let selected = null;
             let optionsHtml = "";
@@ -293,7 +284,6 @@ function checkbox  () {
                 }
                 optionsHtml += `<option value="${c.cate}" ${selected}>${c.name}</option>`;
             }
-            // console.log("optionsHtml: ",optionsHtml);
             
             // <td><input id="{item.expenseId}-type"     type="text"   value="{item.type}"   class="form-control"></td>
             
@@ -316,7 +306,6 @@ function checkbox  () {
             // checkboxにcheckedプロパティが存在しているとtrueになることに注意
             head.insertAdjacentHTML("beforeend",insertHead);
 
-            // console.log("id",item.expenseId);
 
         }        
     }
@@ -328,14 +317,12 @@ function boxCheckedStatus () {
     let array = [];
     for(let item of serachedArray) {
         let check = document.getElementById(`${item.expenseId}-box`);
-        // console.log("check: ",check);
         if (check.checked) {
             array.push(true) 
         } else if (!check.checked) {
             array.push(false)
         };
     }
-    // console.log("array: ",array);
     return array.find((isbloom) => isbloom == true);
     
 }
@@ -346,13 +333,6 @@ async function edit () {
     for(let item of serachedArray) {
 
         let boxStatus = document.getElementById(`${item.expenseId}-box`);
-        // if(boxStatus.checked) {                      //入力された最新の値を送っていない状態
-        //     array.push({id: item.expenseId,
-        //             user: item.userId,
-        //             type: item.type,
-        //             expended: item.expended
-        //     });
-            // document.getElementById(`${item.expenseId}-box`).checked = false;
             if(!boxStatus || !boxStatus.checked) {
                 continue;
             }
@@ -361,10 +341,6 @@ async function edit () {
             let type = document.getElementById(`${item.expenseId}-type`).value;
             let expended = document.getElementById(`${item.expenseId}-expended`).value;
 
-            // if(!type || !expended ) {
-            //     continue;
-            // }
-
             array.push({id: item.expenseId,
                         // date: date,
                         type: type,
@@ -372,7 +348,6 @@ async function edit () {
             });
         // }
     }
-    // console.log("array: ",array);
     const res = await fetch("/api/edit", {
         method:"POST",
         headers: {"Content-Type":"application/json"},
@@ -383,17 +358,6 @@ async function edit () {
     })
     
     const data = await res.json();
-    // console.log("data: ",data);
-    // console.log("editModeInEditFn:",editMode);
-
-    // btnEdit.addEventListener("click", (e) => {
-    //     e.preventDefault();
-    //     if (editMode == true) {
-    //         console.log("editMode:",editMode);
-    //         editMode == false;
-    //         pastTable();
-    //     }
-    // })
     return array;
 }
 
@@ -415,7 +379,6 @@ btnDelete.addEventListener("click" , async (e) => {
         array.push(item);
 
     }
-    console.log("array: ",array);
 
     const res = await fetch("/api/delete", {
         method:"POST",
@@ -426,7 +389,6 @@ btnDelete.addEventListener("click" , async (e) => {
     });
 
     const data = await res.json();
-    console.log("data: ",data);
     pastTable();
 })
 
@@ -445,7 +407,6 @@ async function addItemFn () {
     addItem = await add.json();
     array_0 = addItem.data;
 
-    // console.log(addItem);
 
     for (let item of addItem.data) {
         
@@ -465,8 +426,6 @@ async function addItemFn () {
 
     addTbody.insertAdjacentHTML("beforeend",addItemHtml);
 
-    // console.log("addItem: ",addItem)
-    // console.log("addItemHtml: ",addItemHtml)
 }
 
 
@@ -475,25 +434,7 @@ const addBtnEdit = document.getElementById("addBtnEdit");
 addBtnEdit.addEventListener("click", async (e) => {
     e.preventDefault();
 
-    //ボタンを押したか判定　　　未完成 array0の扱いが問題になってる
-    // let boxStatusArray = [];
-    // for(let item of array_0) {
-    //     let box = document.getElementById(`add-${item._id}-box`).checked;
-    //     console.log("box: ",box)
-    //     boxStatusArray.push(box);
-    // }
-    // console.log("boxStatusArray: ",boxStatusArray)
-    // let judge = boxStatusArray.find(item => {
-    //     console.log("iteminarray:",item)
-    //     if(item == true) {
-    //         return true;
-    //     } else {
-    //         return false;
-    //     }
-    // })
-
     let judge = addItemCheckBox();
-    console.log("judge: ",judge);
 
     if(!judge) {
         alert("チェックボックスエラー");
@@ -517,29 +458,23 @@ function addItemCheckBox () {
     let boxStatusArray = [];
     for(let item of array_0) {
         let box = document.getElementById(`add-${item._id}-box`).checked;
-        console.log("box: ",box)
         boxStatusArray.push(box);
     }
-    console.log("boxStatusArray: ",boxStatusArray)
     let judge = boxStatusArray.find(item => {
-        console.log("iteminarray:",item)
         if(item == true) {
             return true;
         } else {
             return false;
         }
     })
-    console.log("judge: ",judge);
 
     return judge;
 }
-
 
 //編集画面に切り替える
 async function editaddItem () {
     
     array_0 = addItem.data;
-    console.log("前の方　array_0: ",array_0)
     // console.log("addItem2: ",addItem);
     
     for(let item of array_0) {
@@ -548,21 +483,10 @@ async function editaddItem () {
         let head = document.getElementById(`row-${item._id}`);
         let addInsertHtml = "";
         
-        // console.log("head: ",head);
-        // head.textContent = "";
-
         //チェックが入っていたら編集画面にする
         if(!box) {
             continue;
         } else {
-            // array_0 = array_0.filter(item_0 => {
-            //     if(item_0 !== item) {
-            //         console.log("item: ",item)
-            //         return item;
-            //     } else if (item_0 == item) {
-            //         array_1.push(item);
-            //     }
-            // })
             head.textContent = "";
             addInsertHtml = 
             `        
@@ -571,13 +495,12 @@ async function editaddItem () {
                 <td> <input id="add-${item._id}-cate"     type="text"   value="${item.cate}" class="form-control"></td>
                 <td class="text-center">
                 <div class="form-check m-0 d-inline-block">
-                <input id="add-${item._id}-box" class="form-check-input" type="checkbox" checked>
-                    </div>
+                    <input id="add-${item._id}-box" class="form-check-input" type="checkbox" checked>
+                </div>
                 </td>
             </tr>
             `
         }
-        console.log("後ろの方　array_0: ",array_0)
         // console.log("addInsertHtml: ",addInsertHtml)
         head.insertAdjacentHTML("beforeend",addInsertHtml);
     }
@@ -612,7 +535,7 @@ async function addEditSave () {
         })
     })
     const data = res.json();
-    console.log(data);
+    // console.log(data);
 }
 
 //削除ボタン
@@ -622,7 +545,7 @@ addBtnDelete.addEventListener("click", async (e) => {
     let judge = addItemCheckBox();
     
     if (!judge) {
-        console.log("削除");
+        // console.log("削除");
         alert("チェックボックスエラー");
         return;
     }
@@ -641,7 +564,7 @@ async function addItemDelete () {
             checkBoxArray.push({id: item._id});
         }
     }
-    console.log("checkBoxArray: ",checkBoxArray);
+    // console.log("checkBoxArray: ",checkBoxArray);
 
     const res = await fetch("/api/add_delete", {
         method: "POST",
@@ -683,3 +606,204 @@ logoutBtn.addEventListener("click",async (e) => {
     
 });
 
+let mode = 0;
+const userBtnEdit = document.getElementById("userBtnEdit");
+userBtnEdit.addEventListener("click",async (e) => {
+    e.preventDefault();
+
+    let judge = await checkBoxMember();
+    if(!judge) {
+        alert("チェックボックスエラー");
+        return;
+    }
+    if(mode == 0) {
+
+        await changeAdmin();
+        mode = 1;
+        userBtnEdit.textContent = "保存";
+    } else if (mode == 1) {
+        await sendData();
+        await userInfomation();
+        mode = 0;
+        userBtnEdit.textContent = "編集";
+    }
+
+});
+
+//削除ボタン
+const userBtnDelete = document.getElementById("userBtnDelete");
+userBtnDelete.addEventListener("click",async (e) =>{
+    e.preventDefault();
+
+    let judge = await checkBoxMember();
+    if(!judge) {
+        alert("ボックスエラー")
+        return;
+    }
+
+    await deleteUser();
+    await userInfomation();
+
+})
+
+//削除機能
+async function deleteUser () {
+    let array = [];
+    let list = await userList();
+    for(let user of list) {
+        let box = document.getElementById(`add-${user._id}-box`);
+        if(box && box.checked) {
+            array.push(user._id);
+        }
+    }
+    console.log("userArray",array);
+    const res = await fetch("/api/userDelet",{
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body:JSON.stringify({
+            data:array
+        })
+    })
+
+    const data = res.json();
+    console.log(data);
+}
+
+//ユーザー情報を引き出す
+async function userInfomation () {
+    try {
+
+        let list = await userList();
+        console.log("list: ",list);
+        document.getElementById("tbody-userInfo").textContent = "";
+        let insertUserinfo = "";
+        for(let user of list) {
+            insertUserinfo +=
+        `
+        <tr id="row-${user._id}" data-id="${user._id}">
+            <td id="add-${user._id}-name"     type="text"   value="${user.id}" class="text-align">${user.id}</td>
+            <td id="add-${user._id}-cate"     type="text"   value="${user.role}" >${user.role}</td>
+            <td class="text-center">
+                <div class="form-check m-0 d-inline-block">
+                    <input id="add-${user._id}-box" class="form-check-input" type="checkbox">
+                </div>
+            </td>
+        </tr>
+        `
+        }
+        const userBody = document.getElementById("tbody-userInfo");
+        userBody.insertAdjacentHTML("beforeend",insertUserinfo);
+
+    } catch (e) {
+        console.error(e);
+
+    }
+}
+
+//権限の変更画面
+async function changeAdmin () {
+    let ubody = document.getElementById("tbody-userInfo");
+    let insertHtml = "";
+    let list = await userList();
+    
+    for(let user of list) {
+        let box = document.getElementById(`add-${user._id}-box`).checked;
+        let head = document.getElementById(`row-${user._id}`)
+        
+        if(!box) {
+            continue;
+        } else {
+            head.textContent = "";
+            
+            insertHtml =  
+            `
+            <tr id="row-${user._id}" data-id="${user._id}">
+                <td> <input id="add-${user._id}-name"     type="text"   value="${user.id}" class="text-align form-control"></td>
+                <td> <input id="add-${user._id}-cate"     type="text"   value="${user.role}" class="form-control" ></td>
+                <td class="text-center">
+                    <div class="form-check m-0 d-inline-block">
+                        <input id="add-${user._id}-box" class="form-check-input" type="checkbox" checked>
+                    </div>
+                </td>
+            </tr>
+            `
+        }
+        // ubody.textContent = "";
+        head.insertAdjacentHTML("beforeend",insertHtml);
+    }
+}
+//変更したユーザーの情報を送る
+async function sendData () {
+    let list = await userList();
+    let dataArray = [];
+    
+    for(let user of list) {
+        let box = document.getElementById(`add-${user._id}-box`);
+        // console.log("box:",box)
+        
+        let id = user.id;
+        let role = user.role;
+
+        if (!box.checked) {
+            continue;
+        } 
+
+        let idEle = document.getElementById(`add-${user._id}-name`);
+        let roleEle = document.getElementById(`add-${user._id}-cate`);
+
+        if (box && idEle && roleEle) {
+            id = idEle.value;
+            role = roleEle.value;
+        }
+        // console.log("id: ",id)
+        // console.log("role: ",role)
+        dataArray.push({_id:user._id,id:id,role:role});
+    }
+
+    const res = await fetch("/api/userEdit/",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({
+            data:dataArray
+        })
+    })
+    let data = res.json();
+    console.log("data742: ",data);
+}
+
+//チェックボックス
+async function checkBoxMember () {
+    let boxStatus = [];
+    let list = await userList();
+
+    for (let user of list) {
+        if(document.getElementById(`add-${user._id}-box`).checked) {
+            boxStatus.push(true);
+        } else {
+            boxStatus.push(false);
+        }
+        
+    }
+    let judge = null;
+    if(boxStatus.length >= 1) {
+        judge = boxStatus.find(item => {
+            if (item == true) {
+                return true;
+            } else {
+                return false;
+            }
+        })
+    }
+    return judge;
+}
+
+async function userList () {
+    const res = await fetch("/api/userAdmin",{
+        method:"GET"
+    });
+
+    const data = await res.json();
+    const list = data.userList;
+
+    return list;
+}

@@ -104,7 +104,7 @@ app.post("/api/login", async (req,res) => {
     try {
 
         const {id,pass} = req.body;
-        // console.log("受信：", id, pass);
+        console.log("受信：", id, pass);
         
         if (!id || !pass) {
             return res.status(400).json({ok:false,message:"IDとパスワードが必要です"});
@@ -423,6 +423,112 @@ app.post("/api/add_delete", async (req,res) => {
     await Addobj.deleteMany({
         _id: {$in:adArray},
     });
+
+});
+
+app.get("/api/userAdmin",async (req,res) => {
+    try {
+
+        const obj = await User.find();
+
+        const userList = [];
+        console.log("userList: ",userList)
+        
+        for(let user of obj) {
+
+            // console.log("user: ",user);
+            userList.push({_id: user._id,
+                id: user.id,
+                // userPassHash: user.passHash,　！！！ハッシュ値は復号できない仕様になっている
+                role: user.role
+            })
+        }
+        
+        res.json({ok:true, userList:userList});
+    } catch(e) {
+        console.error(e);
+    }
+
+})
+
+app.post("/api/userEdit", async (req,res) => {
+    try {
+
+        const data = req.body.data;
+        console.log(data);
+        
+        const ops = data.map(row => ({
+            updateOne:{
+                filter:{_id:row._id},
+                update:{
+                    $set: {
+                        id:row.id,
+                        role:row.role
+                    }
+                }
+                
+            }
+        }));
+        const result = await User.bulkWrite(ops, {order:false});
+        
+        res.json({
+            ok:true,
+            message:"保存しました",
+            matchedCount: result.matchedCount,
+            modifiedCount: result.modifiedCount
+        });
+    } catch(e) {
+        console.error(e);
+        res.json({ok:false,message:"エラー"});
+    }
+
+})
+
+app.post("/api/userDelet",async(req,res) => {
+    const data = req.body.data;
+    console.log(data);
+    res.json({ok:true,message:"通信完了"});
+
+    await User.deleteMany({
+        _id :{$in:data}
+    })
+})
+
+//ユーザーの確認
+app.post("/api/passChange",async(req,res)=>{
+    try {
+
+        const { id, pass} = req.body;
+        
+        const user = await User.findOne({id:id});
+        console.log("user: ",user);
+        res.json({ok:true,message:"ok"})
+    } catch(e) {
+        console.error(e);
+        res.json({ok:false,message:"bad"})
+    }
+})
+
+app.post("/api/saveChangePass",async (req,res) => {
+    try {
+
+        const {id,pass} = req.body;
+        
+        const okId = await User.findOne({id:id});
+        const passHash = await bcrypt.hash(pass,10);
+        console.log("okId: ",okId)
+        if(!okId) {
+            res.json({ok:false,message:"該当ユーザーが存在しません"});
+        }
+        await User.updateOne( 
+            {id:okId.id},
+            {$set: {passHash:passHash}}
+        )
+        res.json({ok:true,message:"パスワードを変更しました。"});
+    } catch(e) {
+        console.error(e);
+        res.json({ok:false,message:"変更に失敗しました。"})
+    }
 
 })
 
