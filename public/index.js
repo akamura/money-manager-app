@@ -151,16 +151,17 @@ function pastValue(){
     document.getElementById("expended_of_week").textContent = weekExpense;
     document.getElementById("expended_of_month").textContent = monthExpense;
     
-    document.getElementById("hourly_expended_of_today").textContent = Math.floor((todayExpense / 24) * 100) / 100;
+    document.getElementById("hourly_expended_of_today").textContent = Math.floor((todayExpense / 6) * 100) / 100;
     //週だと日曜時にnow.getDay()が０になってしまい計算がNaNになるのでMath.max()を使い、最低値を１にする
     const dayOfWeekSafe = Math.max(1, now.getDay());
-    document.getElementById("hourly_expended_of_week").textContent = Math.floor(((weekExpense / dayOfWeekSafe) / 24) * 100) / 100;
-    document.getElementById("hourly_expended_of_month").textContent = Math.floor(((monthExpense / now.getDate()) / 24) * 100) / 100;
+    document.getElementById("hourly_expended_of_week").textContent = Math.floor(((weekExpense / dayOfWeekSafe) / 6) * 100) / 100;
+    document.getElementById("hourly_expended_of_month").textContent = Math.floor(((monthExpense / now.getDate()) / 6) * 100) / 100;
     
     //貼り付け
     pricePast(calc(PERIOD.MONTH));
     //グラフ
-    pieChart (0);
+    pieChart(0);
+    barGraph("bar");
     
 }
 
@@ -317,6 +318,149 @@ function calc (period) {//データの整理・処理
 
     return categolyArray;
 }
+let mode = 0;
+const btnDaily = document.getElementById("btnDaily");
+const btnWeekly = document.getElementById("btnWeekly");
+const btnMonthly = document.getElementById("btnMonthly");
+
+btnDaily.addEventListener("click",async (e) => {
+    e.preventDefault();
+    mode = 0;
+    graphStyle = "bar"
+    selectGraphStyle.value = "bar"
+    await barGraph(graphStyle);
+});
+btnWeekly.addEventListener("click",async (e) => {
+    e.preventDefault();
+    mode = 1;
+    graphStyle = "bar"
+    selectGraphStyle.value = "bar"
+    await barGraph(graphStyle);
+});
+btnMonthly.addEventListener("click",async (e) => {
+    e.preventDefault();
+    mode = 2;
+    graphStyle = "bar"
+    selectGraphStyle.value = "bar"
+    await barGraph(graphStyle);
+});
+
+//一日ごとの出金額を出す 今日までの7日分 //週ごと　月ごと
+async function byDateExpended (mode) {
+    const res = await fetch("/api/expenses", {
+        method:"GET"
+    });
+    const json = await res.json();
+    const items = json.item;
+
+    // mode = 1;//テスト用
+    if(mode == null) {
+        mode =0;
+    }
+
+    let today0;
+    let startDate;
+    let array;
+
+    if (mode == 0) {
+        today0 = new Date(now.getFullYear(),now.getMonth(),now.getDate(),23,59,59,999);
+        startDate = new Date(today0.getFullYear(),today0.getMonth(),today0.getDate() - 6,0,0,0,0);
+        // console.log("today0: ",today0);
+        // console.log("startDate: ",startDate);
+        array =[];
+        for(let i = 0;i < 7;i++){
+            let testDate = new Date(startDate.getFullYear(),startDate.getMonth(),startDate.getDate() + i,0,0,0,0)
+            let d = fmtymd(testDate,0);
+            array.push({date:d,expended:0});//date(日付)をkeyにして、その日の合計を引き出す設計にする
+        }
+    } 
+    if (mode == 1) {
+        today0 = new Date(now.getFullYear(),now.getMonth(),now.getDate(),23,59,59,999);
+        startDate = new Date(today0.getFullYear(),today0.getMonth(),today0.getDate() - (5 * 7), 0, 0, 0, 0);
+        array =[];
+        for(let i = 0;i < 6;i++){
+            let testDate = new Date(startDate.getFullYear(),startDate.getMonth(),startDate.getDate() + (i * 7),0,0,0,0)
+            let d = fmtymd(testDate,0);
+            array.push({date:d,expended:0});//date(日付)をkeyにして、その日の合計を引き出す設計にする
+        }
+    }
+    if (mode == 2) {
+        array =[];
+        today0 = new Date(now.getFullYear(),now.getMonth(),now.getDate(),23,59,59,999);
+        startDate = new Date(today0.getFullYear(),today0.getMonth() - 5,today0.getDate(), 0, 0, 0, 0);
+        for(let i = 0;i < 6;i++){
+            let testDate = new Date(startDate.getFullYear(),startDate.getMonth() + i,startDate.getDate(),0,0,0,0)
+            let d = fmtymd(testDate,2);
+            array.push({date:d,expended:0});//date(日付)をkeyにして、その日の合計を引き出す設計にする
+        }
+    }
+
+    function fmtymd (d,m) {//mode 0:文字列を返す mode 1:Date型を返す
+        if(m == null) {
+            m = 0;
+        }
+        if (m == 0) {
+
+            let yyyy = d.getFullYear();
+            let mm = String(d.getMonth() + 1).padStart(2,"0");
+            let dd = String(d.getDate()).padStart(2,"0");
+            return `${yyyy}-${mm}-${dd}`;
+        }
+        if (m == 1) {
+            let date = new Date(d.getFullYear(),d.getMonth(),d.getDate(),0,0,0,0);
+
+            return date;
+        }
+        if (m == 2) {
+            let yyyy = d.getFullYear();
+            let mm = String(d.getMonth() + 1).padStart(2,"0");
+            return `${yyyy}-${mm}`;
+        }
+    }
+
+    for(let obj of array) {
+        let arrayDate = new Date(obj.date);
+        let fromZeroDate = fmtymd(arrayDate,1);
+        let toSevenDate;
+        if(mode == 1){
+            toSevenDate = new Date(fromZeroDate.getFullYear(),fromZeroDate.getMonth(),fromZeroDate.getDate() + (7),0,0,0,0)
+        }
+        if(mode == 2) {
+            toSevenDate = new Date(fromZeroDate.getFullYear(),fromZeroDate.getMonth() + 1,fromZeroDate.getDate(),0,0,0,0)
+        }
+        
+        let sum = 0;
+        let key;
+        for (let row of items) {
+            let d = new Date(row.date);//データの中の日付データ
+            
+            if (mode == 0 ) {
+                key = fmtymd(d,0);
+                if(startDate < d && d < today0) {
+                    if(key == obj.date) {
+                        sum = sum + Number(row.expended);
+                    }
+                }
+            } 
+            if (mode == 1) {
+                key = fmtymd(d,1);
+                if(fromZeroDate <= key && key < toSevenDate) {
+                    sum = sum + Number(row.expended);
+                }
+            }
+            if (mode == 2) {
+                key = fmtymd(d,1);
+                if(fromZeroDate <= key && key < toSevenDate) {
+                    sum = sum + Number(row.expended);
+                }
+            }
+            obj.price = sum;
+        }
+    }
+
+    return array;
+};
+
 
 function totalExpence (array) {
     let expence = 0;
@@ -456,6 +600,7 @@ function pieChart (n) {
 
 }
 
+//割合が低いものをその他にまとめる
 function compressSmallSlices (array, thresholdRatio = 0.02) {
     const total = array.reduce((sum,o) => sum + o.price, 0) || 1;
     const big = [];
@@ -469,33 +614,102 @@ function compressSmallSlices (array, thresholdRatio = 0.02) {
     return big;
 }
 
-//棒グラフ
-function barGraph () {
-    
+let graphStyle = null;
+let selectGraphStyle = document.getElementById("chartType");
+selectGraphStyle.addEventListener("change",(e) => {
+    let value = selectGraphStyle.value;
+    console.log(value);
+    if(value == "bar") {
+        barGraph("bar");
+    }
+    if(value == "line") {
+        barGraph("line");
+    }
+})
+
+//棒グラフ or 折れ線グラフ
+async function barGraph (graphStyle) {
+
+    if (graphStyle == null) {
+        graphStyle = "bar";
+    }
+    const dataObjArray = await byDateExpended(mode);
+    // console.log("dataObjArray: ",dataObjArray)
+
+    const labels = dataObjArray.map((obj) => {
+        return obj.date
+    });
+    const data = dataObjArray.map(o => o.price);
+
+    // console.log("barChartLabels: ",labels);
+    // console.log("barChartData: ",data);
+
+    const colorMap = ["#4E79A7","#F28E2B","#E15759","#76B7B2","#59A14F",
+                    "#EDC948","#B07AA1","#FF9DA7","#9C755F","#BAB0AC",        "#4E79A7", // ブルー
+                    "#F28E2B", // オレンジ
+                    "#E15759", // レッド
+                    "#76B7B2", // ティール
+                    "#59A14F", // グリーン
+                    "#EDC948", // イエロー
+                    "#B07AA1", // パープル
+                    "#FF9DA7", // ピンク
+                    "#9C755F", // ブラウン
+                    "#BAB0AC", // グレー
+                    "#86BCB6", // ライトティール
+                    "#FABFD2", // ライトピンク
+                    "#A6CEE3", // 水色
+                    "#1F78B4", // 濃いブルー
+                    "#33A02C", // 濃いグリーン
+                    "#FB9A99", // サーモンピンク
+                    "#E31A1C", // ダークレッド
+                    "#FDBF6F", // 明るいオレンジ
+                    "#CAB2D6", // ラベンダー
+                    "#6A3D9A"  // 濃いパープル
+    ];
+
+    let colorArray = [];
+    const len = dataObjArray.length;
+    for(let i = 0;i<len;i++) {
+        colorArray.push(colorMap[i % colorMap.length]);
+    }
+
+    const canvasBar = document.getElementById("seriesChart");
+    const ctxBar = canvasBar.getContext("2d");
+
+    if (window.myBarChart) {
+        window.myBarChart.destroy();
+    }
+
+    window.myBarChart = new Chart(ctxBar, {
+        type: graphStyle,
+        data: {
+            labels,
+            datasets: [{
+                data: data,
+                backgroundColor: colorArray,
+                borderColor: "#8b95f5ff",
+                bordeWidth: 2,
+                hoverOffset: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: { padding: 8},
+            plugins: {
+                legend: {
+                    display: false,
+                },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => `${ctx.label}: ${Number(ctx.raw).toLocaleString()}円`
+                    }
+                }
+            }
+        }
+    });
 
 }
-
-//一日ごとの出金額を出す 今日までの7日分
-(async function byDateExpended (array) {
-    const res = await fetch("/api/expenses", {
-        method:"GET"
-    });
-    const data = await res.json();
-
-    array = data.item;
-
-    const now = new Date();
-    // now.setDate(now.getDate() - 7);
-
-    console.log("now",now);
-    console.log("now.getDate() -7: ",now);
-    console.log("array: ", array);
-    // for(let i = now.getDate();i < 7; i--){
-    //     now.setDate(now.getDate() - i);
-    //     console.log(now);
-    // }
-})();
-
 
 //管理画面ボタン
 const adminBtn = document.getElementById("adminBtn");

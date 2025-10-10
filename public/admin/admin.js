@@ -60,10 +60,10 @@ let array_1 = [];//fetchで送ってDBの編集に使う。
 //コード⇔日本語　変換
 const cateCodeToName = {};
 const cateNameToCode = {};
-for (let c of categolyArray) {
-    cateCodeToName[c.cate] = c.name;
-    cateNameToCode[c.name] = c.cate;
-}
+// for (let c of categolyArray) {
+//     cateCodeToName[c.cate] = c.name;
+//     cateNameToCode[c.name] = c.cate;
+// }
 
 let currentUser = null;
 
@@ -104,16 +104,38 @@ window.addEventListener("load", async (e) => {
     let addArray = addUnique.filter((item) => {
         return !keyObj.has(item.cate);
     })
+    console.log("addArray: ",addArray)
     
     categolyArray = categolyArray.concat(addArray);
-
+    let counter = 0;
+    let otherNumber = 0;
     for(let name of categolyArray) {
-        
+        // console.log("counter_0: ",counter)
+        // console.log("name: ",name)
+        if(name.cate == "other") {
+            otherNumber = counter;
+            // console.log("counter: ",counter)
+            // console.log("categolyArray.length_1: ",categolyArray.length)
+            continue;
+        } //！！！その他を最後に挿入するようにする！！！
         addOption = addOption + 
         `
         <option value="${name.cate}">${name.name}</option>
         `
+        if (counter == categolyArray.length -2) {
+            addOption = addOption + 
+            `
+            <option value="${categolyArray[otherNumber].cate}">${categolyArray[otherNumber].name}</option>
+            `
+            console.log("categolyArray.length_2: ",categolyArray.length - 2)
+        }
+        counter++;
     }
+    for (let c of categolyArray) {
+        cateCodeToName[c.cate] = c.name;
+        cateNameToCode[c.name] = c.cate;
+    }
+
     // console.log("categolyArray: ",categolyArray)
     // console.log("addOption: ",addOption)
     document.getElementById("cate_name").textContent = "";
@@ -209,6 +231,10 @@ async function pastTable () {
     //テーブルに検索結果を表示する
     document.getElementById("tbody").textContent = "";
     let tbodyTable = "";
+
+    console.log("serachedArray: ",serachedArray);
+    console.log("cateCodeToName: ",cateCodeToName);
+    console.log("cateNameToCode: ",cateNameToCode);
     
     for(let item of serachedArray) {
         let date = new Date(item.date);
@@ -674,7 +700,6 @@ async function userInfomation () {
     try {
 
         let list = await userList();
-        console.log("list: ",list);
         document.getElementById("tbody-userInfo").textContent = "";
         let insertUserinfo = "";
         for(let user of list) {
